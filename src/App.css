@@ -1,0 +1,38 @@
+/* Dark background */
+body {    justify-content: center;
+  
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Container spacing */
+div {
+  padding: 20px;
+}
+
+/* Slot grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+/* Card style */
+.card {
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Available slot */
+.available {
+  background-color: #1e8e3e;
+}
+
+/* Occupied slot */
+.occupied {
+  background-color: #b3261e;
+}
