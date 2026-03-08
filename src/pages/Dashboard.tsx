@@ -1,12 +1,28 @@
-import React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, MapPin, Car, CreditCard } from 'lucide-react';
+import MapComponent, { type ParkingMarker } from '../components/MapComponent';
 
 export default function Dashboard() {
     const recentBookings = [
         { id: '1', location: 'Downtown Parking Zone A', date: 'Oct 24, 2023', time: '14:00 - 16:00', status: 'Active' },
         { id: '2', location: 'City Mall Basement', date: 'Oct 22, 2023', time: '10:00 - 12:00', status: 'Completed' },
     ];
+
+    const [spots, setSpots] = useState<ParkingMarker[]>([
+        { id: '1', name: 'Downtown Center', location: [18.5150, 73.8550], available: 12, pricePerHour: 20 },
+        { id: '2', name: 'Westside Mall', location: [18.5280, 73.8400], available: 0, pricePerHour: 15 },
+        { id: '3', name: 'Street Ave Parking', location: [18.5250, 73.8650], available: 5, pricePerHour: 10 },
+    ]);
+
+    const handleBook = (id: string, name: string) => {
+        setSpots(prevSpots =>
+            prevSpots.map(spot =>
+                spot.id === id ? { ...spot, available: spot.available - 1 } : spot
+            )
+        );
+        alert(`Successfully booked a slot at ${name}!`);
+    };
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
@@ -35,6 +51,11 @@ export default function Dashboard() {
                     ))}
                 </div>
 
+                <div className="mb-8">
+                    <h2 className="text-xl font-bold text-white mb-4">Live Parking Availability</h2>
+                    <MapComponent spots={spots} onBook={handleBook} />
+                </div>
+
                 <h2 className="text-xl font-bold text-white mb-4">Recent Bookings</h2>
                 <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
                     <table className="w-full text-left">
@@ -61,7 +82,7 @@ export default function Dashboard() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${booking.status === 'Active' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                'bg-green-500/10 text-green-400 border border-green-500/20'
+                                            'bg-green-500/10 text-green-400 border border-green-500/20'
                                             }`}>
                                             {booking.status}
                                         </span>

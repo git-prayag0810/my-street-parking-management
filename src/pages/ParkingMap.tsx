@@ -1,18 +1,29 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Search, Navigation } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { useState } from 'react';
+import MapComponent, { type ParkingMarker } from '../components/MapComponent';
 
 export default function ParkingMap() {
-    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Placeholder data for map spots
-    const fakeSpots = [
-        { id: 'A-12', name: 'Downtown Center', distance: '0.5 mi', price: '$5/hr', available: 12 },
-        { id: 'B-04', name: 'Westside Mall', distance: '1.2 mi', price: '$3/hr', available: 5 },
-        { id: 'C-99', name: 'Street Ave Parking', distance: '0.8 mi', price: '$4/hr', available: 0 },
-    ];
+    const [spots, setSpots] = useState<ParkingMarker[]>([
+        { id: '1', name: 'Downtown Center', location: [18.5150, 73.8550], available: 12, pricePerHour: 20 },
+        { id: '2', name: 'Westside Mall', location: [18.5280, 73.8400], available: 0, pricePerHour: 15 },
+        { id: '3', name: 'Street Ave Parking', location: [18.5250, 73.8650], available: 5, pricePerHour: 10 },
+    ]);
+
+    const handleBook = (id: string, name: string) => {
+        setSpots(prevSpots =>
+            prevSpots.map(spot =>
+                spot.id === id ? { ...spot, available: spot.available - 1 } : spot
+            )
+        );
+        alert(`Successfully booked a slot at ${name}!`);
+    };
+
+    const filteredSpots = spots.filter(spot =>
+        spot.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="flex flex-col h-[calc(100vh-4rem)] pt-16">
@@ -35,15 +46,15 @@ export default function ParkingMap() {
                 <div className="hidden md:block w-96 bg-gray-900 border-r border-gray-800 overflow-y-auto z-10 p-4 pt-20">
                     <h2 className="text-white font-bold text-xl mb-4">Nearby Parking</h2>
                     <div className="space-y-4">
-                        {fakeSpots.map((spot) => (
+                        {filteredSpots.map((spot) => (
                             <motion.div
                                 whileHover={{ scale: 1.02 }}
                                 key={spot.id}
                                 className={`p-4 rounded-xl border cursor-pointer ${spot.available > 0
-                                        ? 'bg-gray-800 border-gray-700 hover:border-blue-500'
-                                        : 'bg-gray-800/50 border-gray-800 opacity-60'
+                                    ? 'bg-gray-800 border-gray-700 hover:border-blue-500'
+                                    : 'bg-gray-800/50 border-gray-800 opacity-60'
                                     }`}
-                                onClick={() => spot.available > 0 && navigate(`/book/${spot.id}`)}
+                                onClick={() => spot.available > 0 && handleBook(spot.id, spot.name)}
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="text-white font-semibold">{spot.name}</h3>
@@ -53,25 +64,16 @@ export default function ParkingMap() {
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-4 text-sm text-gray-400">
-                                    <span className="flex items-center gap-1"><Navigation className="w-3 h-3" /> {spot.distance}</span>
-                                    <span className="font-bold text-blue-400">{spot.price}</span>
+                                    <span className="font-bold text-blue-400">₹{spot.pricePerHour}/hr</span>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
                 </div>
 
-                {/* Map Area placeholder */}
-                <div className="flex-1 bg-gray-950 relative flex items-center justify-center">
-                    {/* Real implementation would use GoogleMaps here */}
-                    <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
-                    <div className="text-center z-10">
-                        <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 text-blue-500">
-                            <MapPin className="w-8 h-8" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mb-2">Interactive Map Area</h2>
-                        <p className="text-gray-400">Google Maps API integration placeholder</p>
-                    </div>
+                {/* Map Area */}
+                <div className="flex-1 relative z-0">
+                    <MapComponent searchTerm={searchTerm} spots={spots} onBook={handleBook} />
                 </div>
             </div>
         </div>
